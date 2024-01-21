@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Mural</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        #formulario {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ced4da;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #mural {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .nota {
+            position: relative;
+            width: 200px;
+            height: auto;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+            overflow: hidden;
+            word-wrap: break-word;
+            background-color: #ffffff;
+        }
+
+        .nota:hover {
+            transform: scale(1.05);
+        }
+
+        .nota .editar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #007bff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .editar:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .titulo {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .anexo {
+            margin-top: 10px;
+        }
+
+        .board-opcoes {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .board-opcoes button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .board-opcoes button:hover {
+            background-color: #0056b3;
+        }
+
+        .board-opcoes #adicionar-nota-btn {
+            background-color: #28a745;
+        }
+
+        .board-opcoes #adicionar-nota-btn:hover {
+            background-color: #218838;
+        }
+
+        .prioridade-branco {
+            background-color: #ffffff;
+        }
+
+        .prioridade-vermelho {
+            background-color: red;
+        }
+
+        .prioridade-amarelo {
+            background-color: yellow;
+        }
+
+        .prioridade-verde {
+            background-color: green;
+        }
+
+        @media (max-width: 600px) {
+            #mural {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nota {
+                width: 100%;
+            }
+        }
+
+        ul {
+            list-style-type: none;
+            /* Remove os pontinhos da lista */
+            padding: 0;
+            /* Remove o espaçamento padrão da lista */
+        }
+
+        li {
+            margin-bottom: 10px;
+            /* Adiciona um espaçamento entre os itens da lista */
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Status Report 23/01</h1>
+
+    <div class="board-opcoes">
+        <button class="modo-visualizador-btn" onclick="alternarModo('visualizador')">Modo Visualizador</button>
+        <button class="adicionar-nota-btn" onclick="verificarSenha()">Adicionar Nota</button>
+    </div>
+
+    <div id="formulario">
+        <h2>Adicionar Nota</h2>
+        <form id="formCard" style="display: none;">
+            <ul>
+                <li>
+                    <label for="nomePessoa">Nome da Pessoa:</label>
+                    <select id="nomePessoa" name="nomePessoa">
+                        <option value="Caio">Caio</option>
+                        <option value="Joyce">Joyce</option>
+                        <option value="Hugo">Hugo</option>
+                        <option value="Heloisa">Heloisa</option>
+                        <option value="Gustavo">Gustavo</option>
+                        <option value="Wesley">Wesley</option>
+                        <option value="Lays">Lays</option>
+                        <option value="Lisandra">Lisandra</option>
+                        <option value="Pedro">Pedro</option>
+                    </select>
+                </li>
+                <li>
+                    <label for="semanaPassada">Na semana passada:</label>
+                    <textarea id="semanaPassada" name="semanaPassada" rows="2"></textarea>
+                </li>
+                <li>
+                    <label for="nessaSemana">Nessa semana:</label>
+                    <textarea id="nessaSemana" name="nessaSemana" rows="2"></textarea>
+                </li>
+                <li>
+                    <label for="impedimentos">Impedimentos:</label>
+                    <select id="impedimentos" name="impedimentos" onchange="atualizarCampoOutro()">
+                        <option value="naoHouve">Não houve</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                    <textarea id="outroImpedimento" name="outroImpedimento" rows="2" style="display: none;"></textarea>
+                </li>
+                <li>
+                    <label for="link">Link:</label>
+                    <input type="text" id="link" name="link">
+                </li>
+                <li>
+                    <label for="prioridade">Prioridade:</label>
+                    <select id="prioridade" name="prioridade">
+                        <option value="branco">Branco</option>
+                        <option value="vermelho">Vermelho</option>
+                        <option value="amarelo">Amarelo</option>
+                        <option value="verde">Verde</option>
+                    </select>
+                </li>
+            </ul>
+        </form>
+
+        <div id="listaCards">
+            <h3>Cards existentes:</h3>
+            <!-- A lista será preenchida dinamicamente após adicionar um novo card -->
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <button type="button" onclick="adicionarNota()" style="background-color: green;">Inserir Nota</button>
+        </div>
+    </div>
+
+    <div id="mural"></div>
+
+    <script>
+        var modoAtual = 'visualizador';
+
+        function verificarSenha() {
+            var senhaDigitada = sessionStorage.getItem('senhaDigitada');
+            if (!senhaDigitada) {
+                var senha = prompt('Digite sua senha:');
+                if (senha === '1234') {
+                    sessionStorage.setItem('senhaDigitada', 'true');
+                    abrirFormulario();
+                } else {
+                    alert('Senha incorreta.');
+                }
+            } else {
+                abrirFormulario();
+            }
+        }
+
+        function abrirFormulario() {
+            var formulario = document.getElementById('formulario');
+            var formCard = document.getElementById('formCard');
+            formulario.style.display = 'flex';
+            formCard.style.display = 'flex';
+        }
+
+        function adicionarNota() {
+            var form = document.getElementById('formCard');
+            var nomePessoa = form.nomePessoa.value;
+
+            if (existeCardParaPessoa(nomePessoa)) {
+                alert('Card já adicionado para esta pessoa. Selecione outra pessoa.');
+                return;
+            }
+
+            var impedimentosSelect = form.impedimentos;
+            var outroImpedimentoTextarea = form.outroImpedimento;
+
+            var impedimento = '';
+
+            if (impedimentosSelect.value === 'outro') {
+                outroImpedimentoTextarea.style.display = 'block';
+                impedimento = outroImpedimentoTextarea.value;
+            } else {
+                impedimento = impedimentosSelect.value;
+                outroImpedimentoTextarea.style.display = 'none';
+            }
+
+            var semanaPassada = form.semanaPassada.value;
+            var nessaSemana = form.nessaSemana.value;
+            var prioridade = form.prioridade.value;
+            var link = form.link.value;
+
+            if (!nomePessoa) {
+                alert('Selecione uma pessoa.');
+                return;
+            }
+
+            var mural = document.getElementById('mural');
+            var novaNota = document.createElement('div');
+            novaNota.className = 'nota prioridade-' + prioridade;
+            novaNota.innerHTML = `
+                <span class="editar" onclick="editarNota(this)">Editar</span>
+                <div class="titulo">${nomePessoa}</div>
+                ${semanaPassada ? `<div>Na semana passada: ${semanaPassada}</div>` : ''}
+                ${nessaSemana ? `<div>Nessa semana: ${nessaSemana}</div>` : ''}
+                ${impedimento ? `<div>Impedimentos: ${impedimento}</div>` : ''}
+                ${link ? `<div>Link: <a href="${link}" target="_blank">${link}</a></div>` : ''}
+            `;
+
+            mural.appendChild(novaNota);
+            limparFormulario();
+            alternarModo('visualizador');
+        }
+
+        function existeCardParaPessoa(nomePessoa) {
+            var notas = document.querySelectorAll('.nota .titulo');
+            for (var i = 0; i < notas.length; i++) {
+                if (notas[i].innerText === nomePessoa) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function editarNota(elemento) {
+            var form = document.getElementById('formCard');
+            var nota = elemento.parentNode;
+            form.nomePessoa.value = nota.querySelector('.titulo').innerText;
+            form.semanaPassada.value = extrairTexto(nota, 'Na semana passada: ');
+            form.nessaSemana.value = extrairTexto(nota, 'Nessa semana: ');
+            form.impedimentos.value = extrairTexto(nota, 'Impedimentos: ');
+            form.link.value = extrairLink(nota);
+
+            nota.parentNode.removeChild(nota);
+            alternarModo('adicionarNota');
+        }
+
+        function extrairTexto(elemento, label) {
+            var texto = '';
+            for (var i = 0; i < elemento.childNodes.length; i++) {
+                if (elemento.childNodes[i].innerText && elemento.childNodes[i].innerText.startsWith(label)) {
+                    texto = elemento.childNodes[i].innerText.split(label)[1].trim();
+                    break;
+                }
+            }
+            return texto;
+        }
+
+        function extrairLink(elemento) {
+            var linkElement = elemento.querySelector('a');
+            return linkElement ? linkElement.href : '';
+        }
+
+        function limparFormulario() {
+            var form = document.getElementById('formCard');
+            form.reset();
+        }
+
+        function atualizarCampoOutro() {
+            var impedimentosSelect = document.getElementById('impedimentos');
+            var outroImpedimentoTextarea = document.getElementById('outroImpedimento');
+
+            if (impedimentosSelect.value === 'outro') {
+                outroImpedimentoTextarea.style.display = 'block';
+            } else {
+                outroImpedimentoTextarea.style.display = 'none';
+            }
+        }
+
+        function alternarModo(modo) {
+            modoAtual = modo;
+            var formulario = document.getElementById('formulario');
+            var mural = document.getElementById('mural');
+
+            if (modo === 'adicionarNota') {
+                formulario.style.display = 'flex';
+                document.getElementById('formCard').style.display = 'flex';
+                mural.style.display = 'none';
+            } else {
+                formulario.style.display = 'none';
+                document.getElementById('formCard').style.display = 'none';
+                mural.style.display = 'flex';
+                atualizarListaCards();
+            }
+        }
+
+        function atualizarListaCards() {
+            var listaCards = document.getElementById('listaCards');
+            listaCards.innerHTML = '<h3>Cards existentes:</h3>';
+            var notas = document.querySelectorAll('.nota .titulo');
+            for (var i = 0; i < notas.length; i++) {
+                listaCards.innerHTML += `<div>${notas[i].innerText}</div>`;
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
