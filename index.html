@@ -245,6 +245,26 @@
     <script>
         var modoAtual = 'visualizador';
 
+        window.onload = function () {
+            carregarNotasSalvas();
+            alternarModo(modoAtual);
+        };
+
+        function carregarNotasSalvas() {
+            var notasSalvas = localStorage.getItem('notas');
+            if (notasSalvas) {
+                var mural = document.getElementById('mural');
+                mural.innerHTML = notasSalvas;
+            }
+        }
+
+        function salvarNotas() {
+            var mural = document.getElementById('mural');
+            var notas = mural.innerHTML;
+            localStorage.setItem('notas', notas);
+        }
+
+
         function verificarSenha() {
             var senhaDigitada = sessionStorage.getItem('senhaDigitada');
             if (!senhaDigitada) {
@@ -314,6 +334,9 @@
             mural.appendChild(novaNota);
             limparFormulario();
             alternarModo('visualizador');
+
+             // Adicionado para salvar as notas após adicionar uma nova
+             salvarNotas();
         }
 
         function existeCardParaPessoa(nomePessoa) {
