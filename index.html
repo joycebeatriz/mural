@@ -251,7 +251,7 @@
         };
 
         function carregarNotasSalvas() {
-            var notasSalvas = localStorage.getItem('notas');
+            var notasSalvas = getCookie('notas');
             if (notasSalvas) {
                 var mural = document.getElementById('mural');
                 mural.innerHTML = notasSalvas;
@@ -261,9 +261,31 @@
         function salvarNotas() {
             var mural = document.getElementById('mural');
             var notas = mural.innerHTML;
-            localStorage.setItem('notas', notas);
+            setCookie('notas', notas, 365); // Armazena o cookie por 365 dias
         }
 
+        // Função para definir um cookie
+        function setCookie(name, value, days) {
+            var expires = '';
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = '; expires=' + date.toUTCString();
+            }
+            document.cookie = name + '=' + (value || '') + expires + '; path=/';
+        }
+
+        // Função para obter o valor de um cookie
+        function getCookie(name) {
+            var nameEQ = name + '=';
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i];
+                while (cookie.charAt(0) === ' ') cookie = cookie.substring(1, cookie.length);
+                if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+            }
+            return null;
+        }
 
         function verificarSenha() {
             var senhaDigitada = sessionStorage.getItem('senhaDigitada');
@@ -335,8 +357,8 @@
             limparFormulario();
             alternarModo('visualizador');
 
-             // Adicionado para salvar as notas após adicionar uma nova
-             salvarNotas();
+            // Adicionado para salvar as notas após adicionar uma nova
+            salvarNotas();
         }
 
         function existeCardParaPessoa(nomePessoa) {
